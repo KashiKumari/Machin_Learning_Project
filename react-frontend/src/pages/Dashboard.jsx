@@ -30,7 +30,7 @@ const Dashboard = () => {
     setResult(null);
 
     try {
-      const response = await fetch('/predict', {
+      const response = await fetch('https://machin-learning-project-2lnv.onrender.com/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -54,7 +54,7 @@ const Dashboard = () => {
       setResult(data);
     } catch (err) {
       console.error(err);
-      setError('Unable to connect to the prediction backend. Please make sure Flask is running.');
+      setError('Unable to connect to the prediction backend. Please check the deployed API URL and try again.');
     } finally {
       setLoading(false);
     }
