@@ -12,10 +12,10 @@ CORS(app)  # ✅ allow React frontend
 model = pickle.load(open("model.pkl", "rb"))
 scaler = pickle.load(open("scaler.pkl", "rb"))
 
-# ✅ Home route (optional for local testing)
+# ✅ Home route for deployment health check
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return "Backend is live 🚀"
 
 # ✅ Prediction route
 @app.route("/predict", methods=["POST"])
