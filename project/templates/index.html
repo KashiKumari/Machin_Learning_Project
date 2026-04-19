@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machinery Defect Prediction</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f4f4f4; 
+        }
+        .container { 
+            max-width: 500px; 
+            margin: auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            text-align: center; 
+            color: #333; 
+        }
+        form { 
+            display: flex; 
+            flex-direction: column; 
+        }
+        label { 
+            margin-top: 15px; 
+            font-weight: bold; 
+            color: #333;
+            display: block;
+        }
+        small {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-top: 3px;
+            margin-bottom: 6px;
+            font-weight: normal;
+        }
+        input { 
+            padding: 8px; 
+            margin-top: 5px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        }
+        button { 
+            margin-top: 20px; 
+            padding: 10px; 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 16px; 
+        }
+        button:hover { 
+            background: #218838; 
+        }
+        #result { 
+            margin-top: 20px; 
+            padding: 10px; 
+            border-radius: 4px; 
+            text-align: center; 
+        }
+        .defective { 
+            background: #f8d7da; 
+            color: #721c24; 
+        }
+        .non-defective { 
+            background: #d4edda; 
+            color: #155724; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Machinery Defect Prediction</h1>
+        <form id="predictionForm">
+            <label for="production_volume">Production Volume</label>
+            <small>Total number of units produced in a cycle</small>
+            <input type="number" id="production_volume" required>
+
+            <label for="production_cost">Production Cost</label>
+            <small>Total cost incurred during production</small>
+            <input type="number" id="production_cost" required>
+
+            <label for="defect_rate">Defect Rate (%)</label>
+            <small>Percentage of defective items produced</small>
+            <input type="number" step="0.1" id="defect_rate" required>
+
+            <label for="quality_score">Quality Score</label>
+            <small>Overall quality rating (0–100)</small>
+            <input type="number" step="0.1" id="quality_score" required>
+
+            <label for="maintenance_hours">Maintenance Hours</label>
+            <small>Time spent on machine maintenance</small>
+            <input type="number" step="0.1" id="maintenance_hours" required>
+
+            <label for="stockout_rate">Stockout Rate (%)</label>
+            <small>Frequency of inventory shortages</small>
+            <input type="number" step="0.1" id="stockout_rate" required>
+
+            <label for="energy_efficiency">Energy Efficiency</label>
+            <small>Efficiency of energy usage (0–1)</small>
+            <input type="number" step="0.01" min="0" max="1" id="energy_efficiency" required>
+
+            <button type="submit">Predict</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                production_volume: parseFloat(document.getElementById('production_volume').value),
+                production_cost: parseFloat(document.getElementById('production_cost').value),
+                defect_rate: parseFloat(document.getElementById('defect_rate').value),
+                quality_score: parseFloat(document.getElementById('quality_score').value),
+                maintenance_hours: parseFloat(document.getElementById('maintenance_hours').value),
+                stockout_rate: parseFloat(document.getElementById('stockout_rate').value),
+                energy_efficiency: parseFloat(document.getElementById('energy_efficiency').value)
+            };
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = result.prediction === 'Defective' ? 'defective' : 'non-defective';
+                const factorSign = result.random_factor >= 0 ? '+' : '';
+                resultDiv.innerHTML = `
+                    <p><strong>Prediction:</strong> ${result.prediction}</p>
+                    <p><strong>Confidence:</strong> ${result.confidence}</p>
+                    <p><strong>Live Variation Factor:</strong> ${factorSign}${result.random_factor.toFixed(3)}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = '<p style="color: red;">Error occurred. Please try again.</p>';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+flask
+numpy
+scikit-learn
+requests
+python-dotenv
+gunicorn
